@@ -94,11 +94,12 @@ class App extends Component {
           onDismiss={this.onDismiss}
         />
 
-        <h2>Choose a city:</h2>
         <Search
           value={searchTerm}
           onChange={this.onSearchChange}
-        />
+        >
+          Search for a city:
+        </Search>
 
         <Table
           cities={cities}
@@ -124,11 +125,11 @@ class Topics extends Component {
             &nbsp;
             <span>{area.description}</span>
             <span>
-              <button 
-                onClick={() => onDismiss(area.objectID)} 
-                type="button">
+              <Button 
+                onClick={() => onDismiss(area.objectID)}
+              >
                 bubble
-              </button>
+              </Button>
             </span>
           </div>
         )}
@@ -137,39 +138,40 @@ class Topics extends Component {
   }
 }
 
-class Search extends Component {
-  render() {
-    const {value, onChange} = this.props;
-    return (
-      <form>
-        <input 
-          type="text"
-          value={value}
-          onChange={onChange}
-        />
-      </form>
-    );
-  }
-}
+const Search = ({value, onChange, children}) => 
+  <form>
+    {children}
+    <input 
+      type="text"
+      value={value}
+      onChange={onChange}
+    />
+  </form>
 
-class Table extends Component {
-  render() {
-    const {cities, contentFilter} = this.props;
-    return (
-      <div>
-        {cities.filter(isSearched(contentFilter)).map(city =>
-          <div key={city.objectID}>
-            <span>
-              <a href=''>{city.title}</a>
-            </span>
-            &nbsp;
-            <span>{city.host}</span>
-          </div>
-        )}
+
+
+const Table = ({cities, contentFilter}) => 
+  <div>
+    {cities.filter(isSearched(contentFilter)).map(city =>
+      <div key={city.objectID}>
+        <span>
+          <a href=''>{city.title}</a>
+        </span>
+        &nbsp;
+        <span>{city.host}</span>
       </div>
-    );
-  }
-}
+    )}
+  </div>
+ 
+
+const Button = ({onClick, className='', children}) => 
+  <button 
+    onClick={onClick}
+    className={className}
+    type="button"
+  >
+    {children}
+  </button>
 
 
 export default App;
