@@ -5,20 +5,24 @@ import './App.css';
 // List of cities that have Chovic meetup
 const cities = [
   {
-    title: 'Charlottesville',
+    name: 'Charlottesville',
     host: 'Zona Li',
     numGroup: 1,
     objectID: 0,
   },
   {
-    title: 'Washington D.C.',
+    name: 'Washington D.C.',
     host: 'TBD',
     numGroup: 0,
     objectID:1,
   },
+  {
+    name: 'Boston',
+    host: 'TBD',
+    numGroup: 0,
+    objectID:2,
+  },
 ];
-
-
 
 const areas = [
   {
@@ -115,15 +119,7 @@ class App extends Component {
             onChange={this.onSearchChange}
           />
         </form>
-        {this.state.cities.filter(isSearched(this.state.searchTerm)).map(city =>
-          <div key={city.objectID}>
-            <span>
-              <a href=''>{city.title}</a>
-            </span>
-            &nbsp;
-            <span>{city.host}</span>
-          </div>
-        )}
+        <div>{this.state.cities.filter(isSearched(this.state.searchTerm))}</div>
       </div>
     );
   }
