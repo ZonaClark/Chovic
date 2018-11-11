@@ -86,12 +86,37 @@ class App extends Component {
   }
 
   render() {
-    const block1 = 'Decide the areas you want to focus on:';
-    const block2 = 'Choose a city:'
+    const {searchTerm, areas, cities} = this.state;
     return (
       <div className="App">
-        <h2>{block1}</h2>
-        {this.state.areas.map(area =>
+        <Topics
+          areas={areas}
+          onDismiss={this.onDismiss}
+        />
+
+        <h2>Choose a city:</h2>
+        <Search
+          value={searchTerm}
+          onChange={this.onSearchChange}
+        />
+
+        <Table
+          cities={cities}
+          contentFilter={searchTerm}
+        />
+
+      </div>
+    );
+  }
+}
+
+class Topics extends Component {
+  render() {
+    const {areas, onDismiss} = this.props;
+    return (
+      <div>
+        <h2>Decide the areas you want to focus on:</h2>
+        {areas.map(area =>
           <div key={area.objectID}>
             <span>
               <a href=''>{area.color}</a>
@@ -100,22 +125,39 @@ class App extends Component {
             <span>{area.description}</span>
             <span>
               <button 
-                onClick={() => this.onDismiss(area.objectID)} 
+                onClick={() => onDismiss(area.objectID)} 
                 type="button">
                 bubble
               </button>
             </span>
           </div>
         )}
+      </div>
+    );
+  }
+}
 
-        <h2>{block2}</h2>
-        <form>
-          <input 
-            type="text" 
-            onChange={this.onSearchChange}
-          />
-        </form>
-        {this.state.cities.filter(isSearched(this.state.searchTerm)).map(city =>
+class Search extends Component {
+  render() {
+    const {value, onChange} = this.props;
+    return (
+      <form>
+        <input 
+          type="text"
+          value={value}
+          onChange={onChange}
+        />
+      </form>
+    );
+  }
+}
+
+class Table extends Component {
+  render() {
+    const {cities, contentFilter} = this.props;
+    return (
+      <div>
+        {cities.filter(isSearched(contentFilter)).map(city =>
           <div key={city.objectID}>
             <span>
               <a href=''>{city.title}</a>
@@ -131,3 +173,27 @@ class App extends Component {
 
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
