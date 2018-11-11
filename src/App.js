@@ -66,6 +66,13 @@ class App extends Component {
       cities,
       areas,
     };
+
+    this.onDismiss = this.onDismiss.bind(this);
+  }
+
+  onDismiss(id) {
+    const updatedAreas = this.state.areas.filter(area => area.objectID !== id);
+    this.setState({areas: updatedAreas});
   }
 
 
@@ -81,6 +88,13 @@ class App extends Component {
             </span>
             &nbsp;
             <span>{area.description}</span>
+            <span>
+              <button 
+                onClick={() => this.onDismiss(area.objectID)} 
+                type="button">
+                bubble
+              </button>
+            </span>
           </div>
         )}
       </div>
