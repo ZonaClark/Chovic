@@ -88,18 +88,19 @@ class App extends Component {
   render() {
     const {searchTerm, areas, cities} = this.state;
     return (
-      <div className="App">
+      <div className="page">
         <Topics
           areas={areas}
           onDismiss={this.onDismiss}
         />
-
-        <Search
-          value={searchTerm}
-          onChange={this.onSearchChange}
-        >
+        <div className="interactions">
+          <Search
+            value={searchTerm}
+            onChange={this.onSearchChange}
+          >
           Search for a city:
-        </Search>
+          </Search>
+        </div>
 
         <Table
           cities={cities}
@@ -119,11 +120,11 @@ class Topics extends Component {
         <h2>Decide the areas you want to focus on:</h2>
         {areas.map(area =>
           <div key={area.objectID}>
-            <span>
+            <span style={{ padding: 10 }}>
               <a href=''>{area.color}</a>
             </span>
             &nbsp;
-            <span>{area.description}</span>
+            <span style={{ padding: 10 }}>{area.description}</span>
             <span>
               <Button 
                 onClick={() => onDismiss(area.objectID)}
@@ -151,9 +152,9 @@ const Search = ({value, onChange, children}) =>
 
 
 const Table = ({cities, contentFilter}) => 
-  <div>
+  <div className="table">
     {cities.filter(isSearched(contentFilter)).map(city =>
-      <div key={city.objectID}>
+      <div key={city.objectID} className="table-row">
         <span>
           <a href=''>{city.title}</a>
         </span>
@@ -167,7 +168,7 @@ const Table = ({cities, contentFilter}) =>
 const Button = ({onClick, className='', children}) => 
   <button 
     onClick={onClick}
-    className={className}
+    className="button-inline"
     type="button"
   >
     {children}
