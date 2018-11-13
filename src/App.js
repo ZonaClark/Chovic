@@ -10,9 +10,6 @@ const PARAM_SEARCH = 'query=';
 
 
 
-const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
-
-
 class App extends Component {
 
   constructor(props) {
@@ -29,13 +26,21 @@ class App extends Component {
     this.setState({result});
   }
 
-  componentDidMount() {
-    const {searchTerm} = this.state;
-
+  fetchSearchResult = (searchTerm) => {
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
       .then(searchResult => searchResult.json())
       .then(jsonResult => this.setSearchTopBooks(jsonResult))
-      .catch(error => error);  
+      .catch(error => error); 
+  }
+
+  componentDidMount() {
+    const {searchTerm} = this.state;
+    this.fetchSearchResult(searchTerm);
+  }
+
+  onSearchSubmit = () => {
+    const {searchTerm} = this.state;
+    this.fetchSearchResult(searchTerm);
   }
 
   onSearchChange = (event) => {
@@ -55,8 +60,9 @@ class App extends Component {
           <Search
             value={searchTerm}
             onChange={this.onSearchChange}
+            onSearchSubmit={this.onSearchSubmit}
           >
-          Search for an HN article:
+          Search for an HN article
           </Search>
         </div>
 
@@ -65,7 +71,6 @@ class App extends Component {
           result &&
           <Table
             list={result.hits}
-            contentFilter={searchTerm}
             onDismiss={this.onDismiss}
           />
         }
@@ -76,21 +81,25 @@ class App extends Component {
   }
 }
 
-const Search = ({value, onChange, children}) => 
+const Search = ({value, onChange, onSearchSubmit, children}) => 
   <form>
-    {children}
     <input 
       type="text"
       value={value}
       onChange={onChange}
     />
+    <Button 
+      type="submit"
+      onClick={onSearchSubmit}>
+      {children}
+    </Button>
   </form>
 
 
 
-const Table = ({list, contentFilter, onDismiss}) => 
+const Table = ({list, onDismiss}) => 
   <div className="table">
-    {list.filter(isSearched(contentFilter)).map(item =>
+    {list.map(item =>
       <div key={item.objectID} className="table-row">
         <span>
           <a href=''>{item.author}</a>
