@@ -3,12 +3,13 @@ import './App.css';
 
 // Goodreads api URL constants and default parameters
 const DEFAULT_QUERY = 'sapiens';
+const DEFAULT_NUM_HITS = 20;
 
 const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
 const PARAM_SEARCH = 'query=';
-
-
+const PARAM_PAGE = 'page=';
+const PARAM_NUM_HITS = 'hitsPerPage=';
 
 class App extends Component {
 
@@ -22,14 +23,18 @@ class App extends Component {
     
   }
   
-  setSearchTopBooks = (result) => {
-    this.setState({result});
+  setSearchResult = (result) => {
+    const {hits, page} = result;
+
+    const oldHits = page !== 0 ? this.state.result.hits : [];
+    const updatedHits = [...oldHits, ...hits];
+    this.setState({result: {hits: updatedHits, page}});
   }
 
-  fetchSearchResult = (searchTerm) => {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+  fetchSearchResult = (searchTerm, page = 0) => {
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`)
       .then(searchResult => searchResult.json())
-      .then(jsonResult => this.setSearchTopBooks(jsonResult))
+      .then(jsonResult => this.setSearchResult(jsonResult))
       .catch(error => error); 
   }
 
@@ -54,6 +59,7 @@ class App extends Component {
 
   render() {
     const {searchTerm, result} = this.state;
+    const page = 0 || (result && result.page);
     return (
       <div className="page">
         <div className="interactions">
@@ -75,6 +81,7 @@ class App extends Component {
           />
         }
         
+        <Button onClick={() => this.fetchSearchResult(searchTerm, page + 1)}>more</Button>
 
       </div>
     );
