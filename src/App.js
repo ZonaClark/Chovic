@@ -43,10 +43,8 @@ class App extends Component {
   }
 
   onDismiss = (id) => {
-    const updatedList = this.state.result.hits.filter(item => item.objectID !== id);
-    const updatedHits = {hits: updatedList};
-    const updatedResult = Object.assign({}, this.state.result, updatedHits);
-    this.setState({result: updatedResult});
+    const updatedHits = this.state.result.hits.filter(item => item.objectID !== id);
+    this.setState({result: {...this.state.result, hits: updatedHits}});
   }
 
   render() {
