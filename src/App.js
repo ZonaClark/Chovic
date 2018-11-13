@@ -1,62 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
 
+// Goodreads api URL constants and default parameters
+const DEFAULT_QUERY = 'sapiens';
 
-// List of cities that have Chovic meetup
-const cities = [
-  {
-    title: 'Charlottesville',
-    host: 'Zona Li',
-    numGroup: 1,
-    objectID: 0,
-  },
-  {
-    title: 'Washington D.C.',
-    host: 'TBD',
-    numGroup: 0,
-    objectID:1,
-  },
-];
+const PATH_BASE = 'https://hn.algolia.com/api/v1';
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
 
 
-
-const areas = [
-  {
-    color: 'red',
-    description: 'relationship',
-    objectID: 0,
-  },
-  {
-    color: 'orange',
-    description: 'work',
-    objectID: 1,
-  },
-  {
-    color: 'yellow',
-    description: 'growth',
-    objectID: 2,
-  },
-  {
-    color: 'green',
-    description: 'contribution',
-    objectID: 3,
-  },
-  {
-    color: 'indigo',
-    description: 'health',
-    objectID: 4,
-  },
-  {
-    color: 'blue',
-    description: 'mind',
-    objectID: 5,
-  },
-  {
-    color: 'purple',
-    description: 'finance',
-    objectID: 6,
-  },
-];
 
 const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -67,73 +19,54 @@ class App extends Component {
     super(props);
 
     this.state = {
-      cities,
-      areas,
-      searchTerm: '',
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     };
     
-    this.onSearchChange = this.onSearchChange.bind(this);
-    this.onDismiss = this.onDismiss.bind(this);
+  }
+  
+  setSearchTopBooks = (result) => {
+    this.setState({result});
   }
 
-  onSearchChange(event) {
+  componentDidMount() {
+    const {searchTerm} = this.state;
+
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+      .then(searchResult => searchResult.json())
+      .then(jsonResult => this.setSearchTopBooks(jsonResult))
+      .catch(error => error);  
+  }
+
+  onSearchChange = (event) => {
     this.setState({searchTerm: event.target.value});
   }
 
-  onDismiss(id) {
-    const updatedAreas = this.state.areas.filter(area => area.objectID !== id);
-    this.setState({areas: updatedAreas});
+  onDismiss = (id) => {
+    const updatedList = this.state.result.filter(item => item.objectID !== id);
+    this.setState({result: updatedList});
   }
 
   render() {
-    const {searchTerm, areas, cities} = this.state;
+    const {searchTerm, result} = this.state;
+    if (!result) {return null;}
     return (
       <div className="page">
-        <Topics
-          areas={areas}
-          onDismiss={this.onDismiss}
-        />
         <div className="interactions">
           <Search
             value={searchTerm}
             onChange={this.onSearchChange}
           >
-          Search for a city:
+          Search for an HN article:
           </Search>
         </div>
-
+        
         <Table
-          cities={cities}
+          list={result.hits}
           contentFilter={searchTerm}
+          onDismiss={this.onDismiss}
         />
 
-      </div>
-    );
-  }
-}
-
-class Topics extends Component {
-  render() {
-    const {areas, onDismiss} = this.props;
-    return (
-      <div>
-        <h2>Decide the areas you want to focus on:</h2>
-        {areas.map(area =>
-          <div key={area.objectID}>
-            <span style={{ padding: 10 }}>
-              <a href=''>{area.color}</a>
-            </span>
-            &nbsp;
-            <span style={{ padding: 10 }}>{area.description}</span>
-            <span>
-              <Button 
-                onClick={() => onDismiss(area.objectID)}
-              >
-                bubble
-              </Button>
-            </span>
-          </div>
-        )}
       </div>
     );
   }
@@ -151,15 +84,22 @@ const Search = ({value, onChange, children}) =>
 
 
 
-const Table = ({cities, contentFilter}) => 
+const Table = ({list, contentFilter, onDismiss}) => 
   <div className="table">
-    {cities.filter(isSearched(contentFilter)).map(city =>
-      <div key={city.objectID} className="table-row">
+    {list.filter(isSearched(contentFilter)).map(item =>
+      <div key={item.objectID} className="table-row">
         <span>
-          <a href=''>{city.title}</a>
+          <a href=''>{item.author}</a>
         </span>
         &nbsp;
-        <span>{city.host}</span>
+        <span>{item.num_comments}</span>
+        <span>
+          <Button 
+            onClick={() => onDismiss(item.objectID)}
+          >
+            dismiss
+          </Button>
+        </span>
       </div>
     )}
   </div>
