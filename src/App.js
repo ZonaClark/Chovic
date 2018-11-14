@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import './App.css';
 
 // Goodreads api URL constants and default parameters
@@ -12,6 +13,7 @@ const PARAM_PAGE = 'page=';
 const PARAM_NUM_HITS = 'hitsPerPage=';
 
 class App extends Component {
+  call = null; // The call we make to the api using axios
 
   constructor(props) {
     super(props);
@@ -36,10 +38,22 @@ class App extends Component {
     });
   }
 
+
+  makeCall = (config = {}) => {
+    if (this.call) this.call.cancel("Only one request at a time.");
+    this.call = axios.CancelToken.source();
+    config.cancelToken = this.call.token;
+    return axios(config);
+  }
+
   fetchSearchResult = (searchKey, page = 0) => {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchKey}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`)
-      .then(searchResult => searchResult.json())
-      .then(jsonResult => this.setSearchResult(jsonResult))
+    const requestConfig = {
+      method: "get",
+      url: `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchKey}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`,
+      timeout: 10000
+    }
+   this.makeCall(requestConfig)
+      .then(result => this.setSearchResult(result.data))
       .catch(error => this.setState({error})); 
   }
 
