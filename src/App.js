@@ -20,6 +20,7 @@ class App extends Component {
       results: null,
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
+      error: null,
     };
     
   }
@@ -39,7 +40,7 @@ class App extends Component {
     fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchKey}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`)
       .then(searchResult => searchResult.json())
       .then(jsonResult => this.setSearchResult(jsonResult))
-      .catch(error => error); 
+      .catch(error => this.setState({error})); 
   }
 
   componentDidMount() {
@@ -74,7 +75,7 @@ class App extends Component {
   needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
-    const {searchTerm, results, searchKey} = this.state;
+    const {searchTerm, results, searchKey, error} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
     const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
@@ -90,6 +91,7 @@ class App extends Component {
         </div>
 
         {
+          error ? <p>Unable to fetch articles.</p> :
           <Table
             list={list}
             onDismiss={this.onDismiss}
