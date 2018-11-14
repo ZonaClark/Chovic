@@ -51,7 +51,9 @@ class App extends Component {
   onSearchSubmit = (event) => {
     const {searchTerm} = this.state;
     this.setState({searchKey: searchTerm});
-    this.fetchSearchResult(this.state.searchKey);
+    if (this.needNewSearch(searchTerm)) {
+      this.fetchSearchResult(this.state.searchKey);
+    }
     event.preventDefault();
   }
 
@@ -68,6 +70,8 @@ class App extends Component {
       results: {...results, [searchKey]: {hits: updatedHits, page}}
     });
   }
+
+  needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
     const {searchTerm, results, searchKey} = this.state;
