@@ -17,7 +17,8 @@ class App extends Component {
     super(props);
 
     this.state = {
-      result: null,
+      results: null,
+      searchKey: '',
       searchTerm: DEFAULT_QUERY,
     };
     
@@ -25,14 +26,17 @@ class App extends Component {
   
   setSearchResult = (result) => {
     const {hits, page} = result;
+    const {searchKey, results} = this.state;
 
-    const oldHits = page !== 0 ? this.state.result.hits : [];
+    const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
     const updatedHits = [...oldHits, ...hits];
-    this.setState({result: {hits: updatedHits, page}});
+    this.setState({
+      results: {...results, [searchKey]: {hits: updatedHits, page}}
+    });
   }
 
-  fetchSearchResult = (searchTerm, page = 0) => {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`)
+  fetchSearchResult = (searchKey, page = 0) => {
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchKey}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`)
       .then(searchResult => searchResult.json())
       .then(jsonResult => this.setSearchResult(jsonResult))
       .catch(error => error); 
@@ -40,12 +44,15 @@ class App extends Component {
 
   componentDidMount() {
     const {searchTerm} = this.state;
-    this.fetchSearchResult(searchTerm);
+    this.setState({searchKey: searchTerm});
+    this.fetchSearchResult(this.state.searchKey);
   }
 
-  onSearchSubmit = () => {
+  onSearchSubmit = (event) => {
     const {searchTerm} = this.state;
-    this.fetchSearchResult(searchTerm);
+    this.setState({searchKey: searchTerm});
+    this.fetchSearchResult(this.state.searchKey);
+    event.preventDefault();
   }
 
   onSearchChange = (event) => {
@@ -53,13 +60,19 @@ class App extends Component {
   }
 
   onDismiss = (id) => {
-    const updatedHits = this.state.result.hits.filter(item => item.objectID !== id);
-    this.setState({result: {...this.state.result, hits: updatedHits}});
+    const isNotId = item => item.objectID !== id;
+    const {results, searchKey} = this.state;
+    const {hits, page} = results[searchKey];
+    const updatedHits = hits.filter(isNotId);
+    this.setState({
+      results: {...results, [searchKey]: {hits: updatedHits, page}}
+    });
   }
 
   render() {
-    const {searchTerm, result} = this.state;
-    const page = 0 || (result && result.page);
+    const {searchTerm, results, searchKey} = this.state;
+    const page = (results && results[searchKey] && results[searchKey].page) || 0;
+    const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
       <div className="page">
         <div className="interactions">
@@ -73,15 +86,13 @@ class App extends Component {
         </div>
 
         {
-          // If there's no returned result from the api yet, don't render anything.
-          result &&
           <Table
-            list={result.hits}
+            list={list}
             onDismiss={this.onDismiss}
           />
         }
         
-        <Button onClick={() => this.fetchSearchResult(searchTerm, page + 1)}>more</Button>
+        <Button onClick={() => this.fetchSearchResult(searchKey, page + 1)}>more</Button>
 
       </div>
     );
@@ -89,7 +100,7 @@ class App extends Component {
 }
 
 const Search = ({value, onChange, onSearchSubmit, children}) => 
-  <form>
+  <form onSubmit={onSearchSubmit}>
     <input 
       type="text"
       value={value}
