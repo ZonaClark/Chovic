@@ -1,9 +1,79 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import renderer from 'react-test-renderer';
+import App, {Button, Search, Table} from './App';
 
-it('renders without crashing', () => {
-  const div = document.createElement('div');
-  ReactDOM.render(<App />, div);
-  ReactDOM.unmountComponentAtNode(div);
+describe('App', () => {
+
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<App />, div);
+    ReactDOM.unmountComponentAtNode(div);
+  });
+
+  // Snapshot of App component
+  test('has a valid snapshot', () => {
+    const component = renderer.create(<App />);
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+
 });
+
+describe('Button', () => {
+
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<Button>I'm a button</Button>, div);
+    ReactDOM.unmountComponentAtNode(div);
+  });
+
+  test('has a valid snapshot', () => {
+    const component = renderer.create(<Button>I'm a button</Button>);
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+});
+
+describe('Search', () => {
+
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<Search>search</Search>, div);
+    ReactDOM.unmountComponentAtNode(div);
+  });
+
+  test('has a valid snapshot', () => {
+    const component = renderer.create(<Search>search</Search>);
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+});
+
+describe('Table', () => {
+  const props = {
+    list: [
+      {author: 'z', num_comments: 10, objectID: 'a'},
+      {author: 't', num_comments: 5, objectID: 'b'},
+    ],
+  };
+
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<Table {...props} />, div);
+    ReactDOM.unmountComponentAtNode(div);
+  });
+
+  test('has a valid snapshot', () => {
+    const component = renderer.create(<Table {...props} />);
+    let tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+  });
+
+});
+
+
+

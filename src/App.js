@@ -22,7 +22,7 @@ class App extends Component {
       results: null,
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
-      error: null,
+      hasError: false,
     };
     
   }
@@ -38,7 +38,7 @@ class App extends Component {
     });
   }
 
-
+  // Configure axios to make the call to the api only when there's no pending request.
   makeCall = (config = {}) => {
     if (this.call) this.call.cancel("Only one request at a time.");
     this.call = axios.CancelToken.source();
@@ -54,13 +54,18 @@ class App extends Component {
     }
    this.makeCall(requestConfig)
       .then(result => this.setSearchResult(result.data))
-      .catch(error => this.setState({error})); 
+      .catch(error => this.setState({hasError: true})); 
   }
 
   componentDidMount() {
     const {searchTerm} = this.state;
     this.setState({searchKey: searchTerm});
     this.fetchSearchResult(this.state.searchKey);
+  }
+
+  componentDidCatch(error, info) {
+    this.setState({hasError: true});
+    // TODO: log the error to the service
   }
 
   onSearchSubmit = (event) => {
@@ -89,7 +94,7 @@ class App extends Component {
   needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
-    const {searchTerm, results, searchKey, error} = this.state;
+    const {searchTerm, results, searchKey, hasError} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
     const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
@@ -105,7 +110,7 @@ class App extends Component {
         </div>
 
         {
-          error ? <p>Unable to fetch articles.</p> :
+          hasError ? <p>Unable to fetch articles.</p> :
           <Table
             list={list}
             onDismiss={this.onDismiss}
@@ -168,7 +173,7 @@ const Button = ({onClick, className='', children}) =>
 
 export default App;
 
-
+export {Search, Table, Button};
 
 
 
