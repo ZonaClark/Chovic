@@ -24,8 +24,9 @@ class App extends Component {
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
       hasError: false,
+      isLoading: false,
     };
-    
+
   }
   
   setSearchResult = (result) => {
@@ -35,7 +36,8 @@ class App extends Component {
     const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
     const updatedHits = [...oldHits, ...hits];
     this.setState({
-      results: {...results, [searchKey]: {hits: updatedHits, page}}
+      results: {...results, [searchKey]: {hits: updatedHits, page}},
+      isLoading: false,
     });
   }
 
@@ -48,6 +50,7 @@ class App extends Component {
   }
 
   fetchSearchResult = (searchKey, page = 0) => {
+    this.setState({isLoading: true});
     const requestConfig = {
       method: "get",
       url: `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchKey}&${PARAM_PAGE}${page}&${PARAM_NUM_HITS}${DEFAULT_NUM_HITS}`,
@@ -95,7 +98,7 @@ class App extends Component {
   needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
-    const {searchTerm, results, searchKey, hasError} = this.state;
+    const {searchTerm, results, searchKey, hasError, isLoading} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
     const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
@@ -117,27 +120,46 @@ class App extends Component {
             onDismiss={this.onDismiss}
           />
         }
-        
-        <Button onClick={() => this.fetchSearchResult(searchKey, page + 1)}>more</Button>
-
+        {
+          isLoading ? <LoadingIndicator /> :
+          <Button onClick={() => this.fetchSearchResult(searchKey, page + 1)}>more</Button>
+        }
       </div>
     );
   }
 }
 
-const Search = ({value, onChange, onSearchSubmit, children}) => 
-  <form onSubmit={onSearchSubmit}>
-    <input 
-      type="text"
-      value={value}
-      onChange={onChange}
-    />
-    <Button 
-      type="submit"
-      onClick={onSearchSubmit}>
-      {children}
-    </Button>
-  </form>
+class Search extends Component {
+  constructor(props) {
+    super(props);
+    this.searchInputRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.searchInputRef.current.focus();
+  }
+
+  render() {
+    const {value, onChange, onSearchSubmit, children} = this.props;
+
+    return (
+      <form onSubmit={onSearchSubmit}>
+        <input 
+          type="text"
+          value={value}
+          onChange={onChange}
+          ref={this.searchInputRef}
+        />
+        <Button 
+          type="submit"
+          onClick={onSearchSubmit}>
+          {children}
+        </Button>
+      </form>
+    );
+  }
+}
+  
 
 Search.propTypes = {
   value: PropTypes.string,
@@ -191,6 +213,13 @@ Button.propTypes = {
 Button.defaultProps = {
   className: '',
 };
+
+
+const LoadingIndicator = () => 
+  <div>
+    Loading...
+  </div>
+
 
 export default App;
 
