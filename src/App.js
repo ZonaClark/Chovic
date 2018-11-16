@@ -120,10 +120,11 @@ class App extends Component {
             onDismiss={this.onDismiss}
           />
         }
-        {
-          isLoading ? <LoadingIndicator /> :
-          <Button onClick={() => this.fetchSearchResult(searchKey, page + 1)}>more</Button>
-        }
+        <ButtonWithLoading
+          isLoading={isLoading}
+          onClick={() => this.fetchSearchResult(searchKey, page + 1)}>
+          more
+        </ButtonWithLoading>
       </div>
     );
   }
@@ -132,11 +133,19 @@ class App extends Component {
 class Search extends Component {
   constructor(props) {
     super(props);
-    this.searchInputRef = React.createRef();
+    this.searchInput = null;
+
+    this.setSearchInputRef = element => {
+      this.searchInput = element;
+    };
+
+    this.focusSearchInput = () => {
+      if (this.searchInput) this.searchInput.focus();
+    };
   }
 
   componentDidMount() {
-    this.searchInputRef.current.focus();
+    this.focusSearchInput();
   }
 
   render() {
@@ -148,7 +157,7 @@ class Search extends Component {
           type="text"
           value={value}
           onChange={onChange}
-          ref={this.searchInputRef}
+          ref={this.setSearchInputRef}
         />
         <Button 
           type="submit"
@@ -191,7 +200,7 @@ const Table = ({list, onDismiss}) =>
 
 Table.propTypes = {
   list: PropTypes.array.isRequired,
-  onDismiss: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func,
 };
  
 
@@ -220,6 +229,13 @@ const LoadingIndicator = () =>
     Loading...
   </div>
 
+const withLoading = (Component) => ({isLoading, ...rest}) => 
+  isLoading 
+  ? <LoadingIndicator /> 
+  : <Component {...rest} />
+
+
+const ButtonWithLoading = withLoading(Button);
 
 export default App;
 
