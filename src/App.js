@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.css';
+import PropTypes from 'prop-types';
 
 // Goodreads api URL constants and default parameters
 const DEFAULT_QUERY = 'sapiens';
@@ -138,6 +139,12 @@ const Search = ({value, onChange, onSearchSubmit, children}) =>
     </Button>
   </form>
 
+Search.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  onSearchSubmit: PropTypes.func,
+  children: PropTypes.node,
+};
 
 
 const Table = ({list, onDismiss}) => 
@@ -159,9 +166,14 @@ const Table = ({list, onDismiss}) =>
       </div>
     )}
   </div>
+
+Table.propTypes = {
+  list: PropTypes.array.isRequired,
+  onDismiss: PropTypes.func.isRequired,
+};
  
 
-const Button = ({onClick, className='', children}) => 
+const Button = ({onClick, className, children}) => 
   <button 
     onClick={onClick}
     className="button-inline"
@@ -170,6 +182,15 @@ const Button = ({onClick, className='', children}) =>
     {children}
   </button>
 
+Button.propTypes = {
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
+Button.defaultProps = {
+  className: '',
+};
 
 export default App;
 
