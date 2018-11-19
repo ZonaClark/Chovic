@@ -63,6 +63,8 @@ describe('Table', () => {
       {author: 'z', num_comments: 10, objectID: 'a'},
       {author: 't', num_comments: 5, objectID: 'b'},
     ],
+    sortKey: 'TITLE',
+    isSortReverse: false,
   };
 
   it('renders without crashing', () => {

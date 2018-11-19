@@ -16,7 +16,7 @@ exports[`App has a valid snapshot 1`] = `
         value="sapiens"
       />
       <button
-        className="button-inline"
+        className=""
         onClick={[Function]}
         type="button"
       >
@@ -26,7 +26,42 @@ exports[`App has a valid snapshot 1`] = `
   </div>
   <div
     className="table"
-  />
+  >
+    <div
+      className="table-header"
+    >
+      <span>
+        <button
+          className="button-inline"
+          onClick={[Function]}
+          type="button"
+        >
+          Title
+        </button>
+        <button
+          className="button-inline"
+          onClick={[Function]}
+          type="button"
+        >
+          Author
+        </button>
+        <button
+          className="button-inline"
+          onClick={[Function]}
+          type="button"
+        >
+          Comments
+        </button>
+        <button
+          className="button-inline"
+          onClick={[Function]}
+          type="button"
+        >
+          Points
+        </button>
+      </span>
+    </div>
+  </div>
   <div>
     Loading...
   </div>
@@ -35,7 +70,7 @@ exports[`App has a valid snapshot 1`] = `
 
 exports[`Button has a valid snapshot 1`] = `
 <button
-  className="button-inline"
+  className=""
   type="button"
 >
   I'm a button
@@ -48,7 +83,7 @@ exports[`Search has a valid snapshot 1`] = `
     type="text"
   />
   <button
-    className="button-inline"
+    className=""
     type="button"
   >
     search
@@ -61,8 +96,43 @@ exports[`Table has a valid snapshot 1`] = `
   className="table"
 >
   <div
+    className="table-header"
+  >
+    <span>
+      <button
+        className="button-inline button-active"
+        onClick={[Function]}
+        type="button"
+      >
+        Title
+      </button>
+      <button
+        className="button-inline"
+        onClick={[Function]}
+        type="button"
+      >
+        Author
+      </button>
+      <button
+        className="button-inline"
+        onClick={[Function]}
+        type="button"
+      >
+        Comments
+      </button>
+      <button
+        className="button-inline"
+        onClick={[Function]}
+        type="button"
+      >
+        Points
+      </button>
+    </span>
+  </div>
+  <div
     className="table-row"
   >
+    <span />
     <span>
       <a
         href=""
@@ -74,9 +144,10 @@ exports[`Table has a valid snapshot 1`] = `
     <span>
       10
     </span>
+    <span />
     <span>
       <button
-        className="button-inline"
+        className=""
         onClick={[Function]}
         type="button"
       >
@@ -87,6 +158,7 @@ exports[`Table has a valid snapshot 1`] = `
   <div
     className="table-row"
   >
+    <span />
     <span>
       <a
         href=""
@@ -98,9 +170,10 @@ exports[`Table has a valid snapshot 1`] = `
     <span>
       5
     </span>
+    <span />
     <span>
       <button
-        className="button-inline"
+        className=""
         onClick={[Function]}
         type="button"
       >
