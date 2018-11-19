@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { sortBy } from 'lodash';
 import './App.css';
 import PropTypes from 'prop-types';
 
@@ -13,6 +14,14 @@ const PARAM_SEARCH = 'query=';
 const PARAM_PAGE = 'page=';
 const PARAM_NUM_HITS = 'hitsPerPage=';
 
+const SORTS = {
+  NONE: list => list,
+  TITLE: list => sortBy(list, 'title'),
+  AUTHOR: list => sortBy(list, 'author'),
+  COMMENTS: list => sortBy(list, 'num_comments').reverse(),
+  POINTS: list => sortBy(list, 'points').reverse(),
+};
+
 class App extends Component {
   call = null; // The call we make to the api using axios
 
@@ -25,6 +34,7 @@ class App extends Component {
       searchTerm: DEFAULT_QUERY,
       hasError: false,
       isLoading: false,
+      sortKey: 'NONE',
     };
 
   }
@@ -95,10 +105,14 @@ class App extends Component {
     });
   }
 
+  onSort = (sortKey) => {
+    this.setState({sortKey});
+  }
+
   needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
-    const {searchTerm, results, searchKey, hasError, isLoading} = this.state;
+    const {searchTerm, results, searchKey, hasError, isLoading, sortKey} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
     const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
@@ -117,6 +131,8 @@ class App extends Component {
           hasError ? <p>Unable to fetch articles.</p> :
           <Table
             list={list}
+            sortKey={sortKey}
+            onSort={this.onSort}
             onDismiss={this.onDismiss}
           />
         }
@@ -178,15 +194,37 @@ Search.propTypes = {
 };
 
 
-const Table = ({list, onDismiss}) => 
+const Table = ({list, sortKey, onSort, onDismiss}) => 
   <div className="table">
-    {list.map(item =>
+    <div className="table-header">
+      <span>
+        <Sort 
+          sortKey={'TITLE'}
+          onSort={onSort}
+        >Title</Sort>
+        <Sort 
+          sortKey={'AUTHOR'}
+          onSort={onSort}
+        >Author</Sort>
+        <Sort 
+          sortKey={'COMMENTS'}
+          onSort={onSort}
+        >Comments</Sort>
+        <Sort 
+          sortKey={'POINTS'}
+          onSort={onSort}
+        >Points</Sort>
+      </span>
+    </div>
+    {SORTS[sortKey](list).map(item =>
       <div key={item.objectID} className="table-row">
+        <span>{item.title}</span>
         <span>
           <a href=''>{item.author}</a>
         </span>
         &nbsp;
         <span>{item.num_comments}</span>
+        <span>{item.points}</span>
         <span>
           <Button 
             onClick={() => onDismiss(item.objectID)}
@@ -202,7 +240,12 @@ Table.propTypes = {
   list: PropTypes.array.isRequired,
   onDismiss: PropTypes.func,
 };
- 
+
+const Sort = ({sortKey, onSort, children}) => 
+  <Button onClick={() => onSort(sortKey)}>
+    {children}
+  </Button>
+
 
 const Button = ({onClick, className, children}) => 
   <button 
@@ -229,6 +272,7 @@ const LoadingIndicator = () =>
     Loading...
   </div>
 
+// HOC to render either the loading indicator or the passed in component
 const withLoading = (Component) => ({isLoading, ...rest}) => 
   isLoading 
   ? <LoadingIndicator /> 
