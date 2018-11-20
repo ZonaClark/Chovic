@@ -35,8 +35,6 @@ class App extends Component {
       searchTerm: DEFAULT_QUERY,
       hasError: false,
       isLoading: false,
-      sortKey: 'NONE',
-      isSortReverse: false,
     };
 
   }
@@ -107,15 +105,10 @@ class App extends Component {
     });
   }
 
-  onSort = (sortKey) => {
-    const isSortReverse = (this.state.sortKey === sortKey && !this.state.isSortReverse);
-    this.setState({sortKey, isSortReverse});
-  }
-
   needNewSearch = (searchTerm) => !this.state.results[searchTerm];
 
   render() {
-    const {searchTerm, results, searchKey, hasError, isLoading, sortKey, isSortReverse} = this.state;
+    const {searchTerm, results, searchKey, hasError, isLoading} = this.state;
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
     const list = (results && results[searchKey] && results[searchKey].hits) || [];
     return (
@@ -134,9 +127,6 @@ class App extends Component {
           hasError ? <p>Unable to fetch articles.</p> :
           <Table
             list={list}
-            sortKey={sortKey}
-            isSortReverse={isSortReverse}
-            onSort={this.onSort}
             onDismiss={this.onDismiss}
           />
         }
@@ -198,57 +188,79 @@ Search.propTypes = {
 };
 
 
-const Table = ({list, sortKey, isSortReverse, onSort, onDismiss}) => {
-  const sortedList = SORTS[sortKey](list);
-  const reverseSortedList = isSortReverse ? sortedList.reverse() : sortedList;
+class Table extends Component {
+  constructor(props) {
+    super(props);
 
-  return(
-    <div className="table">
-      <div className="table-header">
-        <span>
-          <Sort 
-            sortKey={'TITLE'}
-            activeSortKey={sortKey}
-            onSort={onSort}
-          >Title</Sort>
-          <Sort 
-            sortKey={'AUTHOR'}
-            activeSortKey={sortKey}
-            onSort={onSort}
-          >Author</Sort>
-          <Sort 
-            sortKey={'COMMENTS'}
-            activeSortKey={sortKey}
-            onSort={onSort}
-          >Comments</Sort>
-          <Sort 
-            sortKey={'POINTS'}
-            activeSortKey={sortKey}
-            onSort={onSort}
-          >Points</Sort>
-        </span>
-      </div>
-      {reverseSortedList.map(item =>
-        <div key={item.objectID} className="table-row">
-          <span>{item.title}</span>
+    this.state = {
+      sortKey: 'NONE',
+      isSortReverse: false,
+    };
+  }
+
+  onSort = (sortKey) => {
+    const isSortReverse = (this.state.sortKey === sortKey && !this.state.isSortReverse);
+    this.setState({sortKey, isSortReverse});
+  }
+
+  render() {
+    const {list, onDismiss} = this.props;
+    const {sortKey, isSortReverse} = this.state;
+
+    const sortedList = SORTS[sortKey](list);
+    const reverseSortedList = isSortReverse ? sortedList.reverse() : sortedList;
+
+    return(
+      <div className="table">
+        <div className="table-header">
           <span>
-            <a href=''>{item.author}</a>
-          </span>
-          &nbsp;
-          <span>{item.num_comments}</span>
-          <span>{item.points}</span>
-          <span>
-            <Button 
-              onClick={() => onDismiss(item.objectID)}
-            >
-              dismiss
-            </Button>
+            <Sort 
+              sortKey={'TITLE'}
+              activeSortKey={sortKey}
+              onSort={this.onSort}
+            >Title</Sort>
+            <Sort 
+              sortKey={'AUTHOR'}
+              activeSortKey={sortKey}
+              onSort={this.onSort}
+            >Author</Sort>
+            <Sort 
+              sortKey={'COMMENTS'}
+              activeSortKey={sortKey}
+              onSort={this.onSort}
+            >Comments</Sort>
+            <Sort 
+              sortKey={'POINTS'}
+              activeSortKey={sortKey}
+              onSort={this.onSort}
+            >Points</Sort>
           </span>
         </div>
-      )}
-    </div>
-  );
-}
+        {reverseSortedList.map(item =>
+          <div key={item.objectID} className="table-row">
+            <span>{item.title}</span>
+            <span>
+              <a href=''>{item.author}</a>
+            </span>
+            &nbsp;
+            <span>{item.num_comments}</span>
+            <span>{item.points}</span>
+            <span>
+              <Button 
+                onClick={() => onDismiss(item.objectID)}
+              >
+                dismiss
+              </Button>
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+} 
+
+
 
 Table.propTypes = {
   list: PropTypes.array.isRequired,
