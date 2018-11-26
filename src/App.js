@@ -31,8 +31,8 @@ class App extends Component {
 
     this.state = {
       results: null,
-      searchKey: '',
-      searchTerm: DEFAULT_QUERY,
+      searchKey: '',                // The most recent submitted searchTerm to the API, used to implement the client-side cache.
+      searchTerm: DEFAULT_QUERY,    // Fluctuant variable, it changes as user types in the search field.
       hasError: false,
       isLoading: false,
     };
