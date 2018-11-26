@@ -86,7 +86,7 @@ class App extends Component {
     const {searchTerm} = this.state;
     this.setState({searchKey: searchTerm});
     if (this.needNewSearch(searchTerm)) {
-      this.fetchSearchResult(this.state.searchKey);
+      this.fetchSearchResult(searchTerm);
     }
     event.preventDefault();
   }
