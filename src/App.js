@@ -242,9 +242,7 @@ class Table extends Component {
         {reverseSortedList.map(item =>
           <div key={item.objectID} className="table-row">
             <span>{item.title}</span>
-            <span>
-              <a href=''>{item.author}</a>
-            </span>
+            <span>{item.author}</span>
             &nbsp;
             <span>{item.num_comments}</span>
             <span>{item.points}</span>
