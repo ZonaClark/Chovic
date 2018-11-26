@@ -2,6 +2,10 @@
   "name": "chovic",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "npm": "6.3.0",
+    "node": "10.7.0"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
