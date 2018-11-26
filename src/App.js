@@ -23,6 +23,16 @@ const SORTS = {
   POINTS: list => sortBy(list, 'points').reverse(),
 };
 
+const updateSearchResultState = (hits, page) => (prevState) => {
+  const {searchKey, results} = prevState;
+  const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
+  const updatedHits = [...oldHits, ...hits];
+  return {
+    results: {...results, [searchKey]: {hits: updatedHits, page}},
+    isLoading: false,
+  };
+};
+
 class App extends Component {
   call = null; // The call we make to the api using axios
 
@@ -41,14 +51,7 @@ class App extends Component {
   
   setSearchResult = (result) => {
     const {hits, page} = result;
-    const {searchKey, results} = this.state;
-
-    const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
-    const updatedHits = [...oldHits, ...hits];
-    this.setState({
-      results: {...results, [searchKey]: {hits: updatedHits, page}},
-      isLoading: false,
-    });
+    this.setState(updateSearchResultState(hits, page));
   }
 
   // Configure axios to make the call to the api only when there's no pending request.
@@ -87,7 +90,7 @@ class App extends Component {
     this.setState({searchKey: searchTerm});
     if (this.needNewSearch(searchTerm)) {
       this.fetchSearchResult(searchTerm);         // Must pass searchTerm to the fetch function, not searchKey
-    }
+    }                                             // because React setState is asynchronous.
     event.preventDefault();
   }
 
